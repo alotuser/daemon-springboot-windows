@@ -1,6 +1,6 @@
 package cn.daemon.util;
 
-public class TextUtils {
+public class ResourcesUtil {
 
 	
 	public static final String README_FILE="一款将 SpringBoot 项目做成Windows Service 的 Maven 插件\r\n"

@@ -11,17 +11,18 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
-import cn.daemon.util.FilesUtil;
-import cn.daemon.util.TextUtils;
-import cn.daemon.util.ZipUtils;
+import cn.daemon.util.ResourcesUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 
 @Mojo(name = "make-win-service", defaultPhase = LifecyclePhase.PACKAGE)
 public class WindowsServiceMojo extends AbstractMojo {
@@ -75,28 +76,29 @@ public class WindowsServiceMojo extends AbstractMojo {
             File distDir = new File(targetDir, File.separator + "dist");
             if (distDir.exists()) {
                 try {
-                    FileUtils.deleteDirectory(distDir);
-                } catch (IOException e) {
+                	FileUtil.del(distDir);
+                } catch (Exception e) {
                     getLog().error("删除目录失败！请检查文件是否在使用");
                     e.printStackTrace();
                 }
             }
-            FileUtils.mkdir(distDir.getPath());
+            FileUtil.mkdir(distDir.getPath());
             File logDir = new File(distDir,File.separator + "logs");
-            FileUtils.mkdir(logDir.getPath());
+            FileUtil.mkdir(logDir.getPath());
 
             String jarName= getJarName(isVersion),jarNames=getJarName(isVersion);
-            if(!FileUtils.fileExists(targetDir.getPath() + File.separator +jarNames)) {
+            
+            if(!FileUtil.exist(targetDir.getPath() + File.separator +jarNames)) {
             	jarNames= getJarNames();
             }
             String jarPrefixName=getJarPrefixName(isVersion);
-            /*下载文件*/
+            /*复制文件*/
             ClassPathResource cpr_exe_file = new ClassPathResource("service.exe.yml");
-            FilesUtil.copyStreamToFile(cpr_exe_file.getStream(), new File(distDir,File.separator+jarPrefixName+".exe"));
-            FilesUtil.copyStreamToFile(TextUtils.README_FILE, new File(distDir, File.separator + "readme.txt"));
-            FilesUtil.copyStreamToFile(TextUtils.XML_FILE, new File(distDir,File.separator+jarPrefixName+".xml"));
-            FilesUtil.copyStreamToFile(TextUtils.CONFIG_FILE, new File(distDir,File.separator+jarPrefixName+".exe.config"));
-            FileUtils.copyFile(new File(targetDir.getPath() + File.separator + jarNames), new File(distDir, File.separator + jarName));
+            FileUtil.writeFromStream(cpr_exe_file.getStream(), new File(distDir,File.separator+jarPrefixName+".exe"));
+            FileUtil.writeString(ResourcesUtil.README_FILE, new File(distDir, File.separator + "readme.txt"), CharsetUtil.UTF_8);
+            FileUtil.writeString(ResourcesUtil.XML_FILE, new File(distDir,File.separator+jarPrefixName+".xml"), CharsetUtil.UTF_8);
+            FileUtil.writeString(ResourcesUtil.CONFIG_FILE, new File(distDir,File.separator+jarPrefixName+".exe.config"), CharsetUtil.UTF_8);
+            FileUtil.copy(new File(targetDir.getPath() + File.separator + jarNames), new File(distDir, File.separator + jarName), true);
 
             convert(jarName,jarPrefixName);
             
@@ -108,10 +110,9 @@ public class WindowsServiceMojo extends AbstractMojo {
 
             getLog().info("正在制作压缩包....");
             String zipDir = targetDir.getPath() + File.separator + jarPrefixName + ".zip";
-            ZipUtils.zip(distDir.getPath(), zipDir);
-
+            ZipUtil.zip(distDir.getPath(), zipDir);
             getLog().info("正在清除临时文件....");
-            FileUtils.deleteDirectory(distDir);
+            FileUtil.del(distDir);
             getLog().info("制作完成，文件:" + zipDir);
         } catch (Exception e) {
             getLog().error("制作Windows Service 失败：",e);
@@ -135,8 +136,8 @@ public class WindowsServiceMojo extends AbstractMojo {
             if (arguments.length > 0) {
                 getLog().warn("arguments 参数设置已过期,参数配置可能不会生效,请分别设置 vmOptions 参数 和 programArguments 参数");
             }
-            String vm_options = StringUtils.isEmpty(vmOptions) ? " " : " " + vmOptions + " ";
-            String program_arguments = StringUtils.isEmpty(programArguments) ? "" : " " + programArguments;
+            String vm_options = StrUtil.isEmpty(vmOptions) ? " " : " " + vmOptions + " ";
+            String program_arguments = StrUtil.isEmpty(programArguments) ? "" : " " + programArguments;
             root.element("arguments").setText(vm_options + "-jar " + jarName +  program_arguments);
             saveXML(document,xmlFile);
         } catch (Exception e) {
@@ -167,7 +168,7 @@ public class WindowsServiceMojo extends AbstractMojo {
      */
     private void createBat(File outDri, String fileName, String text) {
         if (!outDri.exists()) {
-            FileUtils.mkdir(outDri.getPath());
+            FileUtil.mkdir(outDri.getPath());
         }
         File file = new File(outDri, fileName);
         try (FileWriter w = new FileWriter(file)) {
