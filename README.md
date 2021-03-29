@@ -60,13 +60,11 @@
 想要在服务启动时添加自定义参数,如 SpringBoot 的配置参数或者 JMV 参数？
 像如下配置即可：
 ``` xml
-    <plugin>
-        <groupId>cn.daemon</groupId>
+   <plugin>
+        <groupId>com.github.alotuser</groupId>
         <artifactId>daemon-springboot-windows</artifactId>
-        <version>0.0.1-RELEASE</version>
         <executions>
             <execution>
-                <id>make-win-service</id>
                 <phase>package</phase>
                 <goals>
                     <goal>make-win-service</goal>
@@ -74,8 +72,9 @@
             </execution>
         </executions>
         <configuration>
+            <isVersion>true</isVersion>
             <vmOptions>-Xms1024m -Xmx2048m</vmOptions>
-            <programArguments>--server.port=8080</programArguments>
+            <programArguments>--spring.profiles.active=pro --server.port=7373</programArguments>
         </configuration>
     </plugin>
 ```
