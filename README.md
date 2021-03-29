@@ -22,7 +22,7 @@
         <plugin>
             <groupId>cn.daemon</groupId>
             <artifactId>daemon-springboot-windows</artifactId>
-            <version>0.0.1-RELEASE<</version>
+            <version>1.0.1<</version>
             <executions>
                 <execution>
                     <id>make-win-service</id>
