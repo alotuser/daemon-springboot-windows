@@ -89,7 +89,7 @@ public class WindowsServiceMojo extends AbstractMojo {
             String jarName= getJarName(isVersion),jarNames=getJarName(isVersion);
             
             if(!FileUtil.exist(targetDir.getPath() + File.separator +jarNames)) {
-            	jarNames= getJarNames();
+            	jarNames= getJarName();
             }
             String jarPrefixName=getJarPrefixName(isVersion);
             /*复制文件*/
@@ -179,10 +179,8 @@ public class WindowsServiceMojo extends AbstractMojo {
                     "%~dp0" + getJarPrefixName(isVersion) + ".exe status\n" +
                     "pause");
         } catch (IOException e) {
-//            throw new MojoExecutionException("Error creating file ", e);
             e.printStackTrace();
         }
-        // ignore
     }
 
     /**
@@ -207,9 +205,5 @@ public class WindowsServiceMojo extends AbstractMojo {
     private String getJarName(boolean isVersion) {
         return getJarPrefixName(isVersion)+"."+packaging;
     }
-    private String getJarNames() {
-        return artifactId+"."+packaging;
-    }
-    
     
 }
