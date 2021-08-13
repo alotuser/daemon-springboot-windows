@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.alotuser</groupId>
 	<artifactId>daemon-springboot-windows</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<packaging>maven-plugin</packaging>
 	<name>daemon-springboot-windows</name>
 	<url>https://github.com/alotuser/daemon-springboot-windows</url>
