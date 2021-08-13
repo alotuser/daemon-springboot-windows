@@ -91,29 +91,32 @@ public class WindowsServiceMojo extends AbstractMojo {
             if(!FileUtil.exist(targetDir.getPath() + File.separator +jarNames)) {
             	jarNames= getJarName();
             }
-            String jarPrefixName=getJarPrefixName(isVersion);
-            /*复制文件*/
-            ClassPathResource cpr_exe_file = new ClassPathResource("service.exe.yml");
-            FileUtil.writeFromStream(cpr_exe_file.getStream(), new File(distDir,File.separator+jarPrefixName+".exe"));
-            FileUtil.writeString(ResourcesUtil.README_FILE, new File(distDir, File.separator + "readme.txt"), CharsetUtil.UTF_8);
-            FileUtil.writeString(ResourcesUtil.XML_FILE, new File(distDir,File.separator+jarPrefixName+".xml"), CharsetUtil.UTF_8);
-            FileUtil.writeString(ResourcesUtil.CONFIG_FILE, new File(distDir,File.separator+jarPrefixName+".exe.config"), CharsetUtil.UTF_8);
-            FileUtil.copy(new File(targetDir.getPath() + File.separator + jarNames), new File(distDir, File.separator + jarName), true);
+            if(FileUtil.exist(targetDir.getPath() + File.separator +jarNames)) {
+            	String jarPrefixName=getJarPrefixName(isVersion);
+                /*复制文件*/
+                ClassPathResource cpr_exe_file = new ClassPathResource("service.exe.yml");
+                FileUtil.writeFromStream(cpr_exe_file.getStream(), new File(distDir,File.separator+jarPrefixName+".exe"));
+                FileUtil.writeString(ResourcesUtil.README_FILE, new File(distDir, File.separator + "readme.txt"), CharsetUtil.UTF_8);
+                FileUtil.writeString(ResourcesUtil.XML_FILE, new File(distDir,File.separator+jarPrefixName+".xml"), CharsetUtil.UTF_8);
+                FileUtil.writeString(ResourcesUtil.CONFIG_FILE, new File(distDir,File.separator+jarPrefixName+".exe.config"), CharsetUtil.UTF_8);
+                FileUtil.copy(new File(targetDir.getPath() + File.separator + jarNames), new File(distDir, File.separator + jarName), true);
 
-            convert(jarName,jarPrefixName);
+                convert(jarName,jarPrefixName);
+                
+                createBat(distDir, "install.bat", "install");
+                createBat(distDir, "uninstall.bat", "uninstall");
+                createBat(distDir, "start.bat", "start");
+                createBat(distDir, "stop.bat", "stop");
+                createBat(distDir, "restart.bat", "restart");
+
+                getLog().info("正在制作压缩包....");
+                String zipDir = targetDir.getPath() + File.separator + jarPrefixName + ".zip";
+                ZipUtil.zip(distDir.getPath(), zipDir);
+                getLog().info("正在清除临时文件....");
+                FileUtil.del(distDir);
+                getLog().info("制作完成，文件:" + zipDir);
+            }
             
-            createBat(distDir, "install.bat", "install");
-            createBat(distDir, "uninstall.bat", "uninstall");
-            createBat(distDir, "start.bat", "start");
-            createBat(distDir, "stop.bat", "stop");
-            createBat(distDir, "restart.bat", "restart");
-
-            getLog().info("正在制作压缩包....");
-            String zipDir = targetDir.getPath() + File.separator + jarPrefixName + ".zip";
-            ZipUtil.zip(distDir.getPath(), zipDir);
-            getLog().info("正在清除临时文件....");
-            FileUtil.del(distDir);
-            getLog().info("制作完成，文件:" + zipDir);
         } catch (Exception e) {
             getLog().error("制作Windows Service 失败：",e);
         }
