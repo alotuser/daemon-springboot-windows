@@ -72,26 +72,24 @@ public class WindowsServiceMojo extends AbstractMojo {
     public void execute() {
         getLog().info("开始生成 Windows Service 必要的文件");
         try {
-            /*创建文件夹*/
-            File distDir = new File(targetDir, File.separator + "dist");
-            if (distDir.exists()) {
-                try {
-                	FileUtil.del(distDir);
-                } catch (Exception e) {
-                    getLog().error("删除目录失败！请检查文件是否在使用");
-                    e.printStackTrace();
-                }
-            }
-            FileUtil.mkdir(distDir.getPath());
-            File logDir = new File(distDir,File.separator + "logs");
-            FileUtil.mkdir(logDir.getPath());
-
             String jarName= getJarName(isVersion),jarNames=getJarName(isVersion);
-            
             if(!FileUtil.exist(targetDir.getPath() + File.separator +jarNames)) {
             	jarNames= getJarName();
             }
             if(FileUtil.exist(targetDir.getPath() + File.separator +jarNames)) {
+            	/*创建文件夹*/
+                File distDir = new File(targetDir, File.separator + "dist");
+                if (distDir.exists()) {
+                    try {
+                    	FileUtil.del(distDir);
+                    } catch (Exception e) {
+                        getLog().error("删除目录失败！请检查文件是否在使用");
+                        e.printStackTrace();
+                    }
+                }
+                FileUtil.mkdir(distDir.getPath());
+                File logDir = new File(distDir,File.separator + "logs");
+                FileUtil.mkdir(logDir.getPath());
             	String jarPrefixName=getJarPrefixName(isVersion);
                 /*复制文件*/
                 ClassPathResource cpr_exe_file = new ClassPathResource("service.exe.yml");
