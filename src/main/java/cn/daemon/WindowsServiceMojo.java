@@ -76,6 +76,9 @@ public class WindowsServiceMojo extends AbstractMojo {
             if(!FileUtil.exist(targetDir.getPath() + File.separator +jarNames)) {
             	jarNames= getJarName();
             }
+            if(!FileUtil.exist(targetDir.getPath() + File.separator +jarNames)) {
+            	jarNames= getJarName(!isVersion);
+            }
             if(FileUtil.exist(targetDir.getPath() + File.separator +jarNames)) {
             	/*创建文件夹*/
                 File distDir = new File(targetDir, File.separator + "dist");
@@ -113,6 +116,8 @@ public class WindowsServiceMojo extends AbstractMojo {
                 getLog().info("正在清除临时文件....");
                 FileUtil.del(distDir);
                 getLog().info("制作完成，文件:" + zipDir);
+            }else {
+            	 getLog().info("制作Windows Service 失败:未找到文件");
             }
             
         } catch (Exception e) {
